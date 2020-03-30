@@ -31,15 +31,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             R.color.colorPrimary
         )
         swipeRefreshLayout.post {
-            swipeRefreshLayout.isRefreshing = true
-            issueViewModel.getAllIssue().observe(
-                this,
-                Observer { issues ->
-                    if (issues != null) {
-                        recyclerAdapter.setList(issues)
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                })
+            loadIssue()
         }
 
 //        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -56,6 +48,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
+        issueViewModel.getAllIssue()
+    }
+
+    private fun loadIssue() {
         swipeRefreshLayout.isRefreshing = true
         issueViewModel.getAllIssue().observe(
             this,
