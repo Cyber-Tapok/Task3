@@ -6,14 +6,16 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.task3.model.GithubIssue
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private val fragmentManager = supportFragmentManager
     private val fragment = IssueDetailFragment()
     private lateinit var recyclerAdapter: RecyclerAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var issueViewModel: IssueViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,14 +24,24 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerAdapter = RecyclerAdapter()
         recyclerView.adapter = recyclerAdapter
-        var issueViewModel = ViewModelProviders.of(this)[IssueViewModel::class.java]
-        issueViewModel.getAllIssue ().observe(
-            this,
-            Observer { issues ->
-                if (issues != null) {
-                    recyclerAdapter.setList(issues)
-                }
-            })
+        issueViewModel = ViewModelProviders.of(this)[IssueViewModel::class.java]
+        swipeRefreshLayout = findViewById(R.id.swipe_container)
+        swipeRefreshLayout.setOnRefreshListener(this)
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.colorPrimary
+        )
+        swipeRefreshLayout.post {
+            swipeRefreshLayout.isRefreshing = true
+            issueViewModel.getAllIssue().observe(
+                this,
+                Observer { issues ->
+                    if (issues != null) {
+                        recyclerAdapter.setList(issues)
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+                })
+        }
+
 //        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
 //            val button = findViewById<MaterialButton>(R.id.fragment_button)
 //            button.setOnClickListener {
@@ -41,5 +53,17 @@ class MainActivity : AppCompatActivity() {
 //                .commit()
 //        }
 
+    }
+
+    override fun onRefresh() {
+        swipeRefreshLayout.isRefreshing = true
+        issueViewModel.getAllIssue().observe(
+            this,
+            Observer { issues ->
+                if (issues != null) {
+                    recyclerAdapter.setList(issues)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            })
     }
 }
