@@ -21,8 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:titleTextColor="@android:color/white"
-            android:elevation="4dp"/>
+            android:elevation="4dp"
+            app:titleTextColor="@android:color/white" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -35,7 +35,6 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/materialCardView"
                     style="@style/CardViewTheme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -49,6 +48,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@{issueDetail.user.login}"
+                            android:scaleType="centerCrop"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -68,6 +70,17 @@
                             tools:text="Cyber-Tapok" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/CardViewTheme">
+                    <TextView
+                        android:layout_margin="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{String.format(@string/created_at, issueDetail.created_at)}"/>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView

@@ -41,6 +41,6 @@ class IssueDetailFragment : Fragment() {
             toolbar.setNavigationOnClickListener { activity!!.onBackPressed() }
         }
         val authorAvatar: ImageView = view.findViewById(R.id.author_avatar)
-        Picasso.get().load(binding.issueDetail?.user?.avatar_url).centerCrop().resize(128, 128).into(authorAvatar)
+        Picasso.get().load(binding.issueDetail?.user?.avatar_url).centerCrop().placeholder(R.drawable.ic_image_placeholder).resize(128, 128).into(authorAvatar)
     }
 }
