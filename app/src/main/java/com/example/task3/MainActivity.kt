@@ -66,11 +66,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
     override fun call(issue: GithubIssue) {
-        Toast.makeText(this, issue.title, Toast.LENGTH_LONG).show()
-        var bundle = Bundle()
-        bundle.putString("TEST", issue.title)
-        fragment.arguments = bundle
         fragmentManager.beginTransaction().addToBackStack(null).add(R.id.fragment_view, fragment)
-                    .commit()
+            .commit()
+        var bundle = Bundle()
+        bundle.putParcelable("TEST", issue)
+        fragment.arguments = bundle
     }
 }

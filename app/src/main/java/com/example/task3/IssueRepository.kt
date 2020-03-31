@@ -22,7 +22,7 @@ class IssueRepository {
 
         val service = retrofit.create(GitHubService::class.java)
 
-        val call: Call<List<GithubIssue>> = service.reposForuser("Cyber-Tapok")
+        val call: Call<List<GithubIssue>> = service.reposForuser("flutter")
 
         call.enqueue(object : Callback<List<GithubIssue>> {
             override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
