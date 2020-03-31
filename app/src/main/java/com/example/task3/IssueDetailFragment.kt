@@ -22,7 +22,7 @@ class IssueDetailFragment : Fragment() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             val toolbar: MaterialToolbar = view.findViewById(R.id.toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
-            toolbar.title = "Работает"
+            toolbar.title = arguments?.getString("TEST")
             toolbar.setNavigationOnClickListener { activity!!.onBackPressed() }
         }
     }
