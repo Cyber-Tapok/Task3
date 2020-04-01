@@ -7,6 +7,6 @@ import retrofit2.http.Path
 
 
 interface GitHubService {
-    @GET("/repos/{user}/flutter/issues?state=all")
-    fun reposForuser(@Path("user") user: String?): Call<List<GithubIssue>>
+    @GET("/repos/{user}/{repos}/issues?state=all")
+    fun issueCall(@Path("user") user: String?, @Path("repos") repos: String?): Call<List<GithubIssue>>
 }

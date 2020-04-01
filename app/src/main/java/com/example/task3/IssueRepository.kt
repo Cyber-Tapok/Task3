@@ -17,13 +17,9 @@ class IssueRepository {
         val builder = Retrofit.Builder()
             .baseUrl("https://api.github.com")
             .addConverterFactory(GsonConverterFactory.create())
-
         val retrofit: Retrofit = builder.build()
-
         val service = retrofit.create(GitHubService::class.java)
-
-        val call: Call<List<GithubIssue>> = service.reposForuser("flutter")
-
+        val call: Call<List<GithubIssue>> = service.issueCall("Toinane", "colorpicker")
         call.enqueue(object : Callback<List<GithubIssue>> {
             override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
             }

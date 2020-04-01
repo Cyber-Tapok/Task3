@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Task3</string>
     <string name="created_at">Created at %1$s</string>
-    <string name="updated_at">Updated at</string>
-    <string name="Deleted_at">Deleted at</string>
+    <string name="updated_at">Updated at %1$s</string>
+    <string name="closed_at">Closed at %1$s</string>
+    <string name="is_empty">Issues list empty</string>
 </resources>

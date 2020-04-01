@@ -1,7 +1,6 @@
 package com.example.task3
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -9,11 +8,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.task3.model.GithubIssue
+import com.google.android.material.snackbar.Snackbar
 
 
-class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, RecyclerAdapter.CallDetailInfo {
+class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
+    RecyclerAdapter.CallDetailInfo {
+
     private val fragmentManager = supportFragmentManager
-    private val fragment = IssueDetailFragment()
     private lateinit var recyclerAdapter: RecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -36,17 +37,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             loadIssue()
         }
 
-//        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-//            val button = findViewById<MaterialButton>(R.id.fragment_button)
-//            button.setOnClickListener {
-//                fragmentManager.beginTransaction().addToBackStack(null).add(R.id.fragment_view, fragment)
-//                    .commit()
-//            }
-//        } else {
-//            fragmentManager.beginTransaction().addToBackStack(null).add(R.id.fragment_view, fragment)
-//                .commit()
-//        }
-
     }
 
     override fun onRefresh() {
@@ -60,16 +50,21 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             Observer { issues ->
                 if (issues != null) {
                     recyclerAdapter.setList(issues)
+                    if(recyclerAdapter.issueList.isEmpty()) {
+                        Snackbar.make(recyclerView, getString(R.string.is_empty), Snackbar.LENGTH_LONG).show()
+                    }
                     swipeRefreshLayout.isRefreshing = false
                 }
             })
     }
 
     override fun call(issue: GithubIssue) {
-        fragmentManager.beginTransaction().addToBackStack(null).add(R.id.fragment_view, fragment)
-            .commit()
-        var bundle = Bundle()
-        bundle.putParcelable("TEST", issue)
+        val fragment = IssueDetailFragment()
+        fragmentManager.beginTransaction().detach(fragment).commit()
+        fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
+        fragmentManager.beginTransaction().attach(fragment).commit()
+        val bundle = Bundle()
+        bundle.putParcelable(FRAGMENT_BUNDLE_ISSUE_KEY, issue)
         fragment.arguments = bundle
     }
 }
