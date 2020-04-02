@@ -2,6 +2,7 @@ package com.example.task3
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.task3.databinding.IssueBindingFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.squareup.picasso.Picasso
+
 
 const val FRAGMENT_BUNDLE_ISSUE_KEY = "issueDetail"
 
@@ -39,9 +41,21 @@ class IssueDetailFragment : Fragment() {
             val toolbar: MaterialToolbar = view.findViewById(R.id.toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
             toolbar.setNavigationOnClickListener {
-                fragmentManager!!.beginTransaction().remove(this).commit()
+                beginDestroyFragment()
             }
+            view.isFocusableInTouchMode = true
+            view.requestFocus()
+            view.setOnKeyListener(object : View.OnKeyListener {
+                override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        beginDestroyFragment()
+                        return true
+                    }
+                    return false
+                }
+            })
         }
+
         val authorAvatar: ImageView = view.findViewById(R.id.author_avatar)
         Picasso.get().load(binding?.issueDetail?.user?.avatar_url)
             .resize(128, 128)
@@ -55,5 +69,7 @@ class IssueDetailFragment : Fragment() {
         binding = null
     }
 
-
+    fun beginDestroyFragment() {
+        fragmentManager!!.beginTransaction().remove(this@IssueDetailFragment).commit()
+    }
 }

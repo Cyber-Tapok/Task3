@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                             Snackbar.LENGTH_LONG
                         ).show()
                     }
-                    swipeRefreshLayout.isRefreshing = false
                 }
+                swipeRefreshLayout.isRefreshing = false
             })
     }
 
