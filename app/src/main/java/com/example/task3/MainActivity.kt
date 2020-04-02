@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     RecyclerAdapter.CallDetailInfo {
 
     private val fragmentManager = supportFragmentManager
-    private lateinit var recyclerAdapter: RecyclerAdapter
+    private var recyclerAdapter: RecyclerAdapter = RecyclerAdapter(this)
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var issueViewModel: IssueViewModel
@@ -25,8 +25,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         setContentView(R.layout.activity_main)
         recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerAdapter = RecyclerAdapter(this)
-        recyclerView.adapter = recyclerAdapter
         issueViewModel = ViewModelProviders.of(this)[IssueViewModel::class.java]
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
@@ -36,12 +34,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout.post {
             loadIssue()
         }
-
+        recyclerAdapter.setHasStableIds(true)
+        recyclerView.adapter = recyclerAdapter
     }
 
     override fun onRefresh() {
         issueViewModel.getAllIssue()
     }
+
 
     private fun loadIssue() {
         swipeRefreshLayout.isRefreshing = true
@@ -50,8 +50,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             Observer { issues ->
                 if (issues != null) {
                     recyclerAdapter.setList(issues)
-                    if(recyclerAdapter.issueList.isEmpty()) {
-                        Snackbar.make(recyclerView, getString(R.string.is_empty), Snackbar.LENGTH_LONG).show()
+                    if (recyclerAdapter.issueList.isEmpty()) {
+                        Snackbar.make(
+                            recyclerView,
+                            getString(R.string.is_empty),
+                            Snackbar.LENGTH_LONG
+                        ).show()
                     }
                     swipeRefreshLayout.isRefreshing = false
                 }

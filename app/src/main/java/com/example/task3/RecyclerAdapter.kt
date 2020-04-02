@@ -33,6 +33,9 @@ class RecyclerAdapter(private var callDetailInfo: CallDetailInfo) :
     override fun getItemCount(): Int {
         return issueList.size
     }
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
 
     override fun onBindViewHolder(holder: IssueViewHolder, position: Int) {
         holder.bind(position)
