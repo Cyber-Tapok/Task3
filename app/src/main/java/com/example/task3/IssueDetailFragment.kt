@@ -43,8 +43,11 @@ class IssueDetailFragment : Fragment() {
             }
         }
         val authorAvatar: ImageView = view.findViewById(R.id.author_avatar)
-        Picasso.get().load(binding?.issueDetail?.user?.avatar_url).centerCrop()
-            .placeholder(R.drawable.ic_image_placeholder).resize(128, 128).into(authorAvatar)
+        Picasso.get().load(binding?.issueDetail?.user?.avatar_url)
+            .resize(128, 128)
+            .centerCrop()
+            .placeholder(R.drawable.ic_image_placeholder)
+            .into(authorAvatar)
     }
 
     override fun onDestroyView() {
