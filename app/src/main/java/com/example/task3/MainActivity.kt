@@ -1,7 +1,6 @@
 package com.example.task3
 
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -18,11 +17,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     RecyclerAdapter.CallDetailInfo, InternetConnectivityListener {
 
     private val fragmentManager = supportFragmentManager
-    private var recyclerAdapter: RecyclerAdapter = RecyclerAdapter(this)
+    private lateinit var recyclerAdapter: RecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var issueViewModel: IssueViewModel
-    private var recyclerViewState: Parcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,11 +33,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout.setColorSchemeResources(
             R.color.colorPrimary
         )
-        recyclerAdapter.setHasStableIds(true)
+        recyclerAdapter = issueViewModel.adapter
         recyclerView.adapter = recyclerAdapter
-        if (recyclerViewState != null) {
-            recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
-        }
+        recyclerAdapter.setListener(this)
         InternetAvailabilityChecker.init(this)
         val mInternetAvailabilityChecker = InternetAvailabilityChecker.getInstance()
         mInternetAvailabilityChecker.addInternetConnectivityListener(this)
@@ -48,11 +44,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onRefresh() {
         issueViewModel.getAllIssue()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        recyclerViewState = recyclerView.layoutManager?.onSaveInstanceState()
-        super.onSaveInstanceState(outState)
     }
 
     private fun loadIssue() {

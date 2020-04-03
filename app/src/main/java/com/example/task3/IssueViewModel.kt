@@ -11,5 +11,9 @@ class IssueViewModel(application: Application) : AndroidViewModel(application) {
     fun getAllIssue() : LiveData<List<GithubIssue>>{
         return issueRepository.getMutableLiveData()
     }
+    val adapter: RecyclerAdapter = RecyclerAdapter()
+    init {
+        adapter.setHasStableIds(true)
+    }
 
 }

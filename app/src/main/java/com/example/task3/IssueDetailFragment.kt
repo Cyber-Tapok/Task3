@@ -43,18 +43,19 @@ class IssueDetailFragment : Fragment() {
             toolbar.setNavigationOnClickListener {
                 beginDestroyFragment()
             }
-            view.isFocusableInTouchMode = true
-            view.requestFocus()
-            view.setOnKeyListener(object : View.OnKeyListener {
-                override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        beginDestroyFragment()
-                        return true
-                    }
-                    return false
-                }
-            })
+
         }
+        view.isFocusableInTouchMode = true
+        view.requestFocus()
+        view.setOnKeyListener(object : View.OnKeyListener {
+            override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
+                if (keyCode == KeyEvent.KEYCODE_BACK && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    beginDestroyFragment()
+                    return true
+                }
+                return false
+            }
+        })
 
         val authorAvatar: ImageView = view.findViewById(R.id.author_avatar)
         Picasso.get().load(binding?.issueDetail?.user?.avatar_url)

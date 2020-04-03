@@ -1,5 +1,7 @@
 package com.example.task3
 
+import android.content.res.Configuration
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +11,11 @@ import com.example.task3.databinding.IssueBinding
 import com.example.task3.model.GithubIssue
 
 
-class RecyclerAdapter(private var callDetailInfo: CallDetailInfo) :
+class RecyclerAdapter() :
     RecyclerView.Adapter<RecyclerAdapter.IssueViewHolder>() {
+
+    private var selectedPosition: Int = -1
+    private lateinit var callDetailInfo: CallDetailInfo
 
     var issueList: List<GithubIssue> = arrayListOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IssueViewHolder {
@@ -28,6 +33,9 @@ class RecyclerAdapter(private var callDetailInfo: CallDetailInfo) :
     fun setList(issueList: List<GithubIssue>) {
         this.issueList = issueList
         notifyDataSetChanged()
+    }
+    fun setListener(callDetailInfo: CallDetailInfo){
+        this.callDetailInfo = callDetailInfo
     }
 
     override fun getItemCount(): Int {
@@ -50,11 +58,19 @@ class RecyclerAdapter(private var callDetailInfo: CallDetailInfo) :
         }
 
         fun bind(position: Int) {
+            if (itemView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                itemView.setBackgroundColor(if (selectedPosition == position) Color.GREEN else Color.TRANSPARENT)
+            }
             binding.issue = issueList[position]
         }
 
         override fun onClick(v: View?) {
             callDetailInfo.call(issueList[adapterPosition])
+//            if (selectedPosition != -1) {
+                notifyItemChanged(selectedPosition)
+                selectedPosition = adapterPosition
+                notifyItemChanged(selectedPosition)
+//            }
         }
     }
 
