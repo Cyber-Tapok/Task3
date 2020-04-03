@@ -14,7 +14,7 @@ import com.example.task3.model.GithubIssue
 class RecyclerAdapter() :
     RecyclerView.Adapter<RecyclerAdapter.IssueViewHolder>() {
 
-    private var selectedPosition: Int = -1
+    var selectedPosition: Int = -1
     private lateinit var callDetailInfo: CallDetailInfo
 
     var issueList: List<GithubIssue> = arrayListOf()
@@ -58,19 +58,15 @@ class RecyclerAdapter() :
         }
 
         fun bind(position: Int) {
-            if (itemView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 itemView.setBackgroundColor(if (selectedPosition == position) Color.GREEN else Color.TRANSPARENT)
-            }
             binding.issue = issueList[position]
         }
 
         override fun onClick(v: View?) {
-            callDetailInfo.call(issueList[adapterPosition])
-//            if (selectedPosition != -1) {
                 notifyItemChanged(selectedPosition)
                 selectedPosition = adapterPosition
                 notifyItemChanged(selectedPosition)
-//            }
+            callDetailInfo.call(issueList[adapterPosition])
         }
     }
 

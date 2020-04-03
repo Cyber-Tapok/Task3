@@ -71,6 +71,7 @@ class IssueDetailFragment : Fragment() {
     }
 
     fun beginDestroyFragment() {
+        (activity as MainActivity?)?.resetAdapterSelectPosition()
         fragmentManager!!.beginTransaction().remove(this@IssueDetailFragment).commit()
     }
 }

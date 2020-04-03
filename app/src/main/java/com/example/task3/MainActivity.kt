@@ -88,5 +88,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             ).show()
         }
     }
+    fun resetAdapterSelectPosition() {
+        recyclerAdapter.selectedPosition = -1
+        recyclerAdapter.notifyDataSetChanged()
+    }
 
 }
