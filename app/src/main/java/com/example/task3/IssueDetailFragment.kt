@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.example.task3.databinding.IssueBindingFragment
@@ -44,17 +45,13 @@ class IssueDetailFragment : Fragment() {
             }
 
         }
-        view.isFocusableInTouchMode = true
-        view.requestFocus()
-        view.setOnKeyListener(object : View.OnKeyListener {
-            override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
-                if (keyCode == KeyEvent.KEYCODE_BACK && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
                     beginDestroyFragment()
-                    return true
-                }
-                return false
             }
-        })
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
         Picasso.get().load(binding?.issueDetail?.user?.avatar_url)
             .resize(128, 128)
             .centerCrop()
