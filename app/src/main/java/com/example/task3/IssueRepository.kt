@@ -11,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class IssueRepository {
     var issueList: List<GithubIssue> = listOf()
     val liveData: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
+    var internetConnect: MutableLiveData<Boolean> = MutableLiveData()
 
 
     fun getMutableLiveData(): MutableLiveData<List<GithubIssue>> {
@@ -20,8 +21,10 @@ class IssueRepository {
         val retrofit: Retrofit = builder.build()
         val service = retrofit.create(GitHubService::class.java)
         val call: Call<List<GithubIssue>> = service.issueCall("Toinane", "colorpicker")
+        internetConnect.value = false
         call.enqueue(object : Callback<List<GithubIssue>> {
             override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
+                internetConnect.value = true
             }
 
             override fun onResponse(

@@ -25,7 +25,6 @@ class RecyclerAdapter :
             parent,
             false
         )
-
         return IssueViewHolder(binding, callDetailInfo)
     }
 
@@ -37,6 +36,7 @@ class RecyclerAdapter :
     fun setListener(callDetailInfo: CallDetailInfo) {
         this.callDetailInfo = callDetailInfo
     }
+
     fun resetSelectItem(position: Int) {
         selectedPosition = -1
         notifyItemChanged(position)
