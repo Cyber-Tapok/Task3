@@ -6,7 +6,6 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.example.task3.databinding.IssueBindingFragment
@@ -38,7 +37,7 @@ class IssueDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding!!.issueDetail = arguments?.getParcelable(FRAGMENT_BUNDLE_ISSUE_KEY)
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            val toolbar: MaterialToolbar = view.findViewById(R.id.toolbar)
+            val toolbar: MaterialToolbar = binding?.toolbar!!
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
             toolbar.setNavigationOnClickListener {
                 beginDestroyFragment()
@@ -56,13 +55,11 @@ class IssueDetailFragment : Fragment() {
                 return false
             }
         })
-
-        val authorAvatar: ImageView = view.findViewById(R.id.author_avatar)
         Picasso.get().load(binding?.issueDetail?.user?.avatar_url)
             .resize(128, 128)
             .centerCrop()
             .placeholder(R.drawable.ic_image_placeholder)
-            .into(authorAvatar)
+            .into(binding!!.authorAvatar)
     }
 
     override fun onDestroyView() {
@@ -72,6 +69,6 @@ class IssueDetailFragment : Fragment() {
 
     fun beginDestroyFragment() {
         (activity as MainActivity?)?.resetAdapterSelectPosition()
-        fragmentManager!!.beginTransaction().remove(this@IssueDetailFragment).commit()
+        requireFragmentManager().beginTransaction().remove(this).commit()
     }
 }

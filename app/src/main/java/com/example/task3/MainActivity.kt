@@ -65,14 +65,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             })
     }
 
-    override fun call(issue: GithubIssue) {
+    override fun openDetails(issue: GithubIssue) {
         val fragment = IssueDetailFragment()
-        fragmentManager.beginTransaction().detach(fragment).commit()
-        fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
-        fragmentManager.beginTransaction().attach(fragment).commit()
         val bundle = Bundle()
         bundle.putParcelable(FRAGMENT_BUNDLE_ISSUE_KEY, issue)
         fragment.arguments = bundle
+        fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
     }
 
     override fun onInternetConnectivityChanged(isConnected: Boolean) {
@@ -88,9 +86,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             ).show()
         }
     }
+
     fun resetAdapterSelectPosition() {
-        recyclerAdapter.selectedPosition = -1
-        recyclerAdapter.notifyDataSetChanged()
+        recyclerAdapter.resetSelectItem(recyclerAdapter.selectedPosition)
     }
 
 }
