@@ -24,6 +24,7 @@
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
             app:title="@{issueDetail.title}"
+            app:navigationIcon="@drawable/ic_arrow_back"
             app:titleTextColor="@android:color/white" />
 
         <ScrollView

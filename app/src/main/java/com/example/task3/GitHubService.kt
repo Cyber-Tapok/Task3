@@ -8,5 +8,5 @@ import retrofit2.http.Path
 
 interface GitHubService {
     @GET("/repos/{user}/{repos}/issues?state=all")
-    fun issueCall(@Path("user") user: String?, @Path("repos") repos: String?): Call<List<GithubIssue>>
+    fun issueCall(@Path("user") user: String, @Path("repos") repos: String): Call<List<GithubIssue>>
 }

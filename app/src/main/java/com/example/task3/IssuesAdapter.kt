@@ -1,6 +1,5 @@
 package com.example.task3
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +9,10 @@ import com.example.task3.databinding.IssueBinding
 import com.example.task3.model.GithubIssue
 
 
-class RecyclerAdapter :
-    RecyclerView.Adapter<RecyclerAdapter.IssueViewHolder>() {
+class IssuesAdapter(private var detailInfo: DetailInfo) :
+    RecyclerView.Adapter<IssuesAdapter.IssueViewHolder>() {
 
     var selectedPosition: Int = -1
-    private lateinit var callDetailInfo: CallDetailInfo
 
     var issueList: List<GithubIssue> = emptyList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IssueViewHolder {
@@ -25,7 +23,7 @@ class RecyclerAdapter :
             parent,
             false
         )
-        return IssueViewHolder(binding, callDetailInfo)
+        return IssueViewHolder(binding, detailInfo)
     }
 
     fun setList(issueList: List<GithubIssue>) {
@@ -33,11 +31,8 @@ class RecyclerAdapter :
         notifyDataSetChanged()
     }
 
-    fun setListener(callDetailInfo: CallDetailInfo) {
-        this.callDetailInfo = callDetailInfo
-    }
-
-    fun resetSelectItem(position: Int) {
+    fun resetSelectItem() {
+        val position = selectedPosition
         selectedPosition = -1
         notifyItemChanged(position)
     }
@@ -56,14 +51,14 @@ class RecyclerAdapter :
 
     inner class IssueViewHolder(
         private val binding: IssueBinding,
-        private val callDetailInfo: CallDetailInfo
+        private val detailInfo: DetailInfo
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         init {
             itemView.setOnClickListener(this)
         }
 
         fun bind(position: Int) {
-            itemView.setBackgroundColor(if (selectedPosition == position) Color.GREEN else Color.TRANSPARENT)
+            itemView.isSelected = selectedPosition == position
             binding.issue = issueList[position]
         }
 
@@ -71,11 +66,11 @@ class RecyclerAdapter :
             notifyItemChanged(selectedPosition)
             selectedPosition = adapterPosition
             notifyItemChanged(selectedPosition)
-            callDetailInfo.openDetails(issueList[adapterPosition])
+            detailInfo.openDetails(issueList[adapterPosition])
         }
     }
 
-    interface CallDetailInfo {
+    interface DetailInfo {
         fun openDetails(issue: GithubIssue)
     }
 }

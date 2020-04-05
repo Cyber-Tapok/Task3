@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.task3.model.GithubIssue
+import com.example.task3.model.Status
 import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
-    RecyclerAdapter.CallDetailInfo {
+    IssuesAdapter.DetailInfo {
 
-    private val fragmentManager = supportFragmentManager
-    private var recyclerAdapter: RecyclerAdapter = RecyclerAdapter()
+    private val recyclerAdapter = IssuesAdapter(this)
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var issueViewModel: IssueViewModel
@@ -28,13 +28,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueViewModel = ViewModelProviders.of(this)[IssueViewModel::class.java]
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
-        swipeRefreshLayout.setColorSchemeResources(
-            R.color.colorPrimary
-        )
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
         recyclerAdapter.setHasStableIds(true)
-        recyclerAdapter.setListener(this)
-        swipeRefreshLayout.post {
-            loadIssue()
+        loadIssue()
+        if (recyclerView.adapter != recyclerAdapter) {
+            recyclerView.adapter = recyclerAdapter
         }
     }
 
@@ -48,23 +46,18 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueViewModel.getAllIssue().observe(
             this,
             Observer { issues ->
-                if (issues != null) {
-                    recyclerAdapter.setList(issues)
-                    if (recyclerAdapter.issueList.isEmpty()) {
-                        Snackbar.make(
-                            recyclerView,
-                            getString(R.string.is_empty),
-                            Snackbar.LENGTH_LONG
-                        ).show()
-                    }
-                }
-                if (recyclerView.adapter != recyclerAdapter) {
-                    recyclerView.adapter = recyclerAdapter
+                recyclerAdapter.setList(issues)
+                if (recyclerAdapter.issueList.isEmpty()) {
+                    Snackbar.make(
+                        recyclerView,
+                        getString(R.string.is_empty),
+                        Snackbar.LENGTH_LONG
+                    ).show()
                 }
                 swipeRefreshLayout.isRefreshing = false
             })
         issueViewModel.internetStatus().observe(this, Observer { status ->
-            if (status) {
+            if (status == Status.FAILED) {
                 Snackbar.make(
                     recyclerView,
                     getString(R.string.internet_connection),
@@ -80,10 +73,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         val bundle = Bundle()
         bundle.putParcelable(FRAGMENT_BUNDLE_ISSUE_KEY, issue)
         fragment.arguments = bundle
-        fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
     }
 
     fun resetAdapterSelectPosition() {
-        recyclerAdapter.resetSelectItem(recyclerAdapter.selectedPosition)
+        recyclerAdapter.resetSelectItem()
     }
 }

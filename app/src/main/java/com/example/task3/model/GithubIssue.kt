@@ -13,5 +13,4 @@ class GithubIssue(
     val created_at: String,
     val updated_at: String,
     val closed_at: String
-
 ) : Parcelable

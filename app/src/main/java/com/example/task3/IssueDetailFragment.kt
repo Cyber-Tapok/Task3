@@ -1,8 +1,6 @@
 package com.example.task3
 
-import android.content.res.Configuration
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +8,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.example.task3.databinding.IssueBindingFragment
-import com.google.android.material.appbar.MaterialToolbar
 import com.squareup.picasso.Picasso
 
 
@@ -36,27 +33,27 @@ class IssueDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding!!.issueDetail = arguments?.getParcelable(FRAGMENT_BUNDLE_ISSUE_KEY)
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            val toolbar: MaterialToolbar = binding?.toolbar!!
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
-            toolbar.setNavigationOnClickListener {
-                beginDestroyFragment()
-            }
-
+        binding?.issueDetail = arguments?.getParcelable(FRAGMENT_BUNDLE_ISSUE_KEY)
+        binding?.toolbar?.setNavigationOnClickListener {
+            closeFragment()
         }
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                    beginDestroyFragment()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
         Picasso.get().load(binding?.issueDetail?.user?.avatar_url)
             .resize(128, 128)
+            .noFade()
             .centerCrop()
             .placeholder(R.drawable.ic_image_placeholder)
             .into(binding!!.authorAvatar)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                closeFragment()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(callback)
     }
 
     override fun onDestroyView() {
@@ -64,7 +61,7 @@ class IssueDetailFragment : Fragment() {
         binding = null
     }
 
-    fun beginDestroyFragment() {
+    fun closeFragment() {
         (activity as MainActivity?)?.resetAdapterSelectPosition()
         requireFragmentManager().beginTransaction().remove(this).commit()
     }
