@@ -11,13 +11,6 @@ class IssueViewModel(application: Application) : AndroidViewModel(application) {
     fun getAllIssue(): LiveData<List<GithubIssue>> {
         return issueRepository.getMutableLiveData()
     }
-
-    var adapter: RecyclerAdapter = RecyclerAdapter()
-
-    init {
-        adapter.setHasStableIds(true)
-    }
-
     fun internetStatus(): LiveData<Boolean> {
         return issueRepository.internetConnect
     }

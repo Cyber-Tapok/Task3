@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     RecyclerAdapter.CallDetailInfo {
 
     private val fragmentManager = supportFragmentManager
-    private lateinit var recyclerAdapter: RecyclerAdapter
+    private var recyclerAdapter: RecyclerAdapter = RecyclerAdapter()
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var issueViewModel: IssueViewModel
@@ -31,8 +31,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout.setColorSchemeResources(
             R.color.colorPrimary
         )
-        recyclerAdapter = issueViewModel.adapter
-        recyclerView.adapter = recyclerAdapter
+        recyclerAdapter.setHasStableIds(true)
         recyclerAdapter.setListener(this)
         swipeRefreshLayout.post {
             loadIssue()
@@ -58,6 +57,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                             Snackbar.LENGTH_LONG
                         ).show()
                     }
+                }
+                if (recyclerView.adapter != recyclerAdapter) {
+                    recyclerView.adapter = recyclerAdapter
                 }
                 swipeRefreshLayout.isRefreshing = false
             })
