@@ -1,5 +1,6 @@
 package com.example.task3
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +10,8 @@ import com.example.task3.databinding.IssueBinding
 import com.example.task3.model.GithubIssue
 
 
-class IssuesAdapter(private var detailInfo: DetailInfo) :
+class IssuesAdapter(private var detailInfo: DetailInfo, var selectedPosition: Int) :
     RecyclerView.Adapter<IssuesAdapter.IssueViewHolder>() {
-
-    var selectedPosition: Int = -1
 
     var issueList: List<GithubIssue> = emptyList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IssueViewHolder {
@@ -29,12 +28,6 @@ class IssuesAdapter(private var detailInfo: DetailInfo) :
     fun setList(issueList: List<GithubIssue>) {
         this.issueList = issueList
         notifyDataSetChanged()
-    }
-
-    fun resetSelectItem() {
-        val position = selectedPosition
-        selectedPosition = -1
-        notifyItemChanged(position)
     }
 
     override fun getItemCount(): Int {
@@ -58,7 +51,9 @@ class IssuesAdapter(private var detailInfo: DetailInfo) :
         }
 
         fun bind(position: Int) {
-            itemView.isSelected = selectedPosition == position
+            if (itemView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                itemView.isSelected = selectedPosition == position
+            }
             binding.issue = issueList[position]
         }
 

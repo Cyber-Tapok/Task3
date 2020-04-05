@@ -11,11 +11,11 @@ import com.example.task3.model.GithubIssue
 import com.example.task3.model.Status
 import com.google.android.material.snackbar.Snackbar
 
-
+const val SELECTED_ITEM_KEY = "selectItem"
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     IssuesAdapter.DetailInfo {
 
-    private val recyclerAdapter = IssuesAdapter(this)
+    private lateinit var recyclerAdapter: IssuesAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var issueViewModel: IssueViewModel
@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         setContentView(R.layout.activity_main)
         recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        recyclerAdapter = IssuesAdapter(this, savedInstanceState?.getInt(SELECTED_ITEM_KEY) ?: -1)
         issueViewModel = ViewModelProviders.of(this)[IssueViewModel::class.java]
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
@@ -39,6 +40,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onRefresh() {
         issueViewModel.getAllIssue()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(SELECTED_ITEM_KEY, recyclerAdapter.selectedPosition)
     }
 
     private fun loadIssue() {
@@ -74,9 +80,5 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         bundle.putParcelable(FRAGMENT_BUNDLE_ISSUE_KEY, issue)
         fragment.arguments = bundle
         supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
-    }
-
-    fun resetAdapterSelectPosition() {
-        recyclerAdapter.resetSelectItem()
     }
 }

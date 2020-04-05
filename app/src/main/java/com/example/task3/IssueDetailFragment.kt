@@ -62,7 +62,6 @@ class IssueDetailFragment : Fragment() {
     }
 
     fun closeFragment() {
-        (activity as MainActivity?)?.resetAdapterSelectPosition()
         requireFragmentManager().beginTransaction().remove(this).commit()
     }
 }
