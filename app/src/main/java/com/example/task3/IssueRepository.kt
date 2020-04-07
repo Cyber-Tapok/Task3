@@ -12,9 +12,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class IssueRepository {
-    val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
-    var currentStatus: MutableLiveData<Status> = MutableLiveData()
-    var isRequestStart: Boolean = false
+    private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
+    private val currentStatus: MutableLiveData<Status> = MutableLiveData()
+    private var isRequestStart: Boolean = false
 
 
     fun getIssueListFromApi(): LiveData<List<GithubIssue>> {
@@ -44,5 +44,8 @@ class IssueRepository {
             })
         }
         return issueList
+    }
+    fun getCurrentStatus(): LiveData<Status> {
+        return currentStatus
     }
 }

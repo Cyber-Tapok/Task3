@@ -38,7 +38,7 @@ class IssueDetailFragment : Fragment() {
             closeFragment()
         }
 
-        Picasso.get().load(binding?.issueDetail?.user?.avatar_url)
+        Picasso.get().load(binding?.issueDetail?.user?.avatarUrl)
             .resize(128, 128)
             .noFade()
             .centerCrop()

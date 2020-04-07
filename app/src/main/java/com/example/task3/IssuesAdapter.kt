@@ -10,7 +10,7 @@ import com.example.task3.databinding.IssueBinding
 import com.example.task3.model.GithubIssue
 
 
-class IssuesAdapter(private var detailInfo: DetailInfo, var selectedPosition: Int) :
+class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: Int) :
     RecyclerView.Adapter<IssuesAdapter.IssueViewHolder>() {
 
     var issueList: List<GithubIssue> = emptyList()

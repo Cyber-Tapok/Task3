@@ -89,7 +89,7 @@
                             style="@style/TextInfoStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{String.format(@string/created_at, issueDetail.created_at)}"
+                            android:text="@{String.format(@string/created_at, issueDetail.createdAt)}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -98,8 +98,8 @@
                             style="@style/TextInfoStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text='@{String.format(@string/updated_at, issueDetail.updated_at)}'
-                            android:visibility='@{issueDetail.updated_at == null ? View.GONE : View.VISIBLE}'
+                            android:text='@{String.format(@string/updated_at, issueDetail.updatedAt)}'
+                            android:visibility='@{issueDetail.updatedAt == null ? View.GONE : View.VISIBLE}'
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/created_at_view" />
 
@@ -108,8 +108,8 @@
                             style="@style/TextInfoStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text='@{String.format(@string/closed_at, issueDetail.closed_at)}'
-                            android:visibility='@{issueDetail.closed_at == null ? View.GONE : View.VISIBLE}'
+                            android:text='@{String.format(@string/closed_at, issueDetail.closedAt)}'
+                            android:visibility='@{issueDetail.closedAt == null ? View.GONE : View.VISIBLE}'
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/updated_at_view" />
 

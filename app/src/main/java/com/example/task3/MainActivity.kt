@@ -32,9 +32,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
         recyclerAdapter.setHasStableIds(true)
         loadIssue()
-        if (recyclerView.adapter != recyclerAdapter) {
-            recyclerView.adapter = recyclerAdapter
-        }
+        recyclerView.adapter = recyclerAdapter
     }
 
 

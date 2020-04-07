@@ -1,6 +1,7 @@
 package com.example.task3.model
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -10,7 +11,7 @@ class GithubIssue(
     val state: String,
     val user: GithubUser,
     val body: String,
-    val created_at: String,
-    val updated_at: String,
-    val closed_at: String
+    @SerializedName("created_at") val createdAt: String,
+    @SerializedName("updated_at") val updatedAt: String,
+    @SerializedName("closed_at") val closedAt: String
 ) : Parcelable
