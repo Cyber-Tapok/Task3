@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.task3.database.Database
+import com.example.task3.database.DummyApp
 import com.example.task3.model.GithubIssue
+import com.example.task3.model.GithubUser
 import com.example.task3.model.Status
 import com.google.android.material.snackbar.Snackbar
 
@@ -31,8 +34,15 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
-        loadIssue()
+        val db: Database = DummyApp.instance.database
+        var issueDao = db.issueDao
+        var user = GithubUser("TEST", ")")
+        var issue = GithubIssue("issue", 228,"open", user, "mmmmmmm","1","2", "3")
+        issueDao.insert(issue)
+
+//        loadIssue()
         recyclerView.adapter = recyclerAdapter
+        recyclerAdapter.setList(issueDao.getAllIssue())
     }
 
 
