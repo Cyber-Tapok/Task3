@@ -12,6 +12,7 @@ import com.example.task3.model.Status
 import com.google.android.material.snackbar.Snackbar
 
 const val SELECTED_ITEM_KEY = "selectItem"
+
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     IssuesAdapter.DetailInfo {
 
@@ -30,7 +31,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
-        recyclerAdapter.setHasStableIds(true)
         loadIssue()
         recyclerView.adapter = recyclerAdapter
     }
@@ -50,7 +50,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueViewModel.getAllIssue().observe(
             this,
             Observer { issues ->
-                recyclerAdapter.setList(issues)
+                if (recyclerAdapter.issueList.isEmpty()) {
+                    recyclerAdapter.setList(issues)
+                } else {
+                    recyclerAdapter.updateList(issues)
+                }
                 if (recyclerAdapter.issueList.isEmpty()) {
                     Snackbar.make(
                         recyclerView,
@@ -61,14 +65,20 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                 swipeRefreshLayout.isRefreshing = false
             })
         issueViewModel.internetStatus().observe(this, Observer { status ->
-            if (status == Status.FAILED) {
+            val snackBarMessage = when (status) {
+                Status.FAILED -> getString(R.string.internet_connection)
+                Status.SUCCESS -> getString(R.string.load_success)
+                Status.LIMIT -> getString(R.string.limit_reached)
+                else -> null
+            }
+            snackBarMessage?. let {
                 Snackbar.make(
                     recyclerView,
-                    getString(R.string.internet_connection),
+                    snackBarMessage,
                     Snackbar.LENGTH_LONG
                 ).show()
-                swipeRefreshLayout.isRefreshing = false
             }
+            swipeRefreshLayout.isRefreshing = false
         })
     }
 
@@ -78,5 +88,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         bundle.putParcelable(FRAGMENT_BUNDLE_ISSUE_KEY, issue)
         fragment.arguments = bundle
         supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
+    }
+
+    fun resetAdapterSelectPosition() {
+        recyclerAdapter.resetSelectItem()
     }
 }

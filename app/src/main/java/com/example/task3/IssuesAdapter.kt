@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.task3.databinding.IssueBinding
 import com.example.task3.model.GithubIssue
@@ -30,6 +31,13 @@ class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: In
         notifyDataSetChanged()
     }
 
+    fun updateList(issueList: List<GithubIssue>) {
+        val issueDiffUtilCallBack = IssueDiffUtilCallback(this.issueList, issueList)
+        val issueDiffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(issueDiffUtilCallBack, false)
+        this.issueList = issueList
+        issueDiffResult.dispatchUpdatesTo(this)
+    }
+
     override fun getItemCount(): Int {
         return issueList.size
     }
@@ -40,6 +48,12 @@ class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: In
 
     override fun onBindViewHolder(holder: IssueViewHolder, position: Int) {
         holder.bind(position)
+    }
+
+    fun resetSelectItem() {
+        val position = selectedPosition
+        selectedPosition = -1
+        notifyItemChanged(position)
     }
 
     inner class IssueViewHolder(

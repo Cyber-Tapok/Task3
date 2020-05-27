@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class GithubIssue(
+data class GithubIssue(
     val title: String,
     val number: Int,
     val state: String,
