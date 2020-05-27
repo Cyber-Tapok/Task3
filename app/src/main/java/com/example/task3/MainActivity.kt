@@ -6,9 +6,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.task3.database.Database
-import com.example.task3.database.DummyApp
 import com.example.task3.model.GithubIssue
 import com.example.task3.model.GithubUser
 import com.example.task3.model.Status
@@ -34,10 +34,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
-        val db: Database = DummyApp.instance.database
-        var issueDao = db.issueDao
+        val db: Database = Room.databaseBuilder(getApplicationContext(),
+        Database::class.java, "databasee")
+        .allowMainThreadQueries()
+            .build()
+        var issueDao = db.issueDao()
         var user = GithubUser("TEST", ")")
-        var issue = GithubIssue("issue", 228,"open", user, "mmmmmmm","1","2", "3")
+        var issue = GithubIssue("issue", 218,"open", user, "mmmmmmm","1","2", "3")
         issueDao.insert(issue)
 
 //        loadIssue()
