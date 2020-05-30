@@ -1,4 +1,4 @@
-package com.example.task3
+package com.example.task3.utils
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.task3.model.GithubIssue

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.task3.databinding.IssueBinding
 import com.example.task3.model.GithubIssue
+import com.example.task3.utils.IssueDiffUtilCallback
 
 
 class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: Int) :
@@ -32,7 +33,11 @@ class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: In
     }
 
     fun updateList(issueList: List<GithubIssue>) {
-        val issueDiffUtilCallBack = IssueDiffUtilCallback(this.issueList, issueList)
+        val issueDiffUtilCallBack =
+            IssueDiffUtilCallback(
+                this.issueList,
+                issueList
+            )
         val issueDiffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(issueDiffUtilCallBack, false)
         this.issueList = issueList
         issueDiffResult.dispatchUpdatesTo(this)

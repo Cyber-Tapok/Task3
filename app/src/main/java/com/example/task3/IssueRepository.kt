@@ -2,40 +2,26 @@ package com.example.task3
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.task3.database.IssueDatabase
 import com.example.task3.model.GithubIssue
 import com.example.task3.model.Status
-import okhttp3.Credentials
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.example.task3.retrofit.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
-class IssueRepository {
+class IssueRepository(var issueDatabase: IssueDatabase) {
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
     private var isRequestStart: Boolean = false
 
 
     fun getIssueListFromApi(): LiveData<List<GithubIssue>> {
-        val okHttpClient = OkHttpClient().newBuilder().addInterceptor { chain ->
-            val originalRequest: Request = chain.request()
-            val builder: Request.Builder = originalRequest.newBuilder().header(
-                "Authorization",
-                Credentials.basic("Cyber-Tapok", "cdLE6fb3drLEnBH")
-            )
-            val newRequest: Request = builder.build()
-            chain.proceed(newRequest)
-        }.build()
-        val builder = Retrofit.Builder()
-            .baseUrl("https://api.github.com")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-        val retrofit: Retrofit = builder.build()
-        val service = retrofit.create(GitHubService::class.java)
+        val service = RetrofitClient().getService()
         if (!isRequestStart) {
             isRequestStart = true
             val call: Call<List<GithubIssue>> = service.issueCall("Cyber-Tapok", "TEST")
@@ -66,5 +52,9 @@ class IssueRepository {
 
     fun getCurrentStatus(): LiveData<Status> {
         return currentStatus
+    }
+    fun getFromDb(): LiveData<List<GithubIssue>> {
+            issueList.value = issueDatabase.issueDao().getAllIssue()
+        return issueList
     }
 }

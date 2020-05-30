@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.task3.model.GithubIssue
 import com.example.task3.model.Status
+import javax.inject.Inject
 
-class IssueViewModel : ViewModel() {
-    private val issueRepository: IssueRepository = IssueRepository()
+
+class IssueViewModel(var issueRepository: IssueRepository) : ViewModel() {
 
     fun getAllIssue(): LiveData<List<GithubIssue>> {
-        return issueRepository.getIssueListFromApi()
+        return issueRepository.getFromDb()
     }
 
     fun internetStatus(): LiveData<Status> {

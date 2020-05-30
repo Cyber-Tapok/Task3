@@ -8,11 +8,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.task3.database.Database
+import com.example.task3.database.IssueDatabase
+import com.example.task3.di.DaggerDatabaseComponent
+import com.example.task3.di.RoomModule
+import com.example.task3.di.ViewModelFactory
 import com.example.task3.model.GithubIssue
-import com.example.task3.model.GithubUser
 import com.example.task3.model.Status
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
+import javax.inject.Inject
 
 const val SELECTED_ITEM_KEY = "selectItem"
 
@@ -24,28 +31,28 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var issueViewModel: IssueViewModel
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        IssueApplication.instance.databaseComponent.inject(this)
         recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         recyclerAdapter = IssuesAdapter(this, savedInstanceState?.getInt(SELECTED_ITEM_KEY) ?: -1)
-        issueViewModel = ViewModelProviders.of(this)[IssueViewModel::class.java]
+        issueViewModel = ViewModelProviders.of(this, viewModelFactory)[IssueViewModel::class.java]
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
-        val db: Database = Room.databaseBuilder(getApplicationContext(),
-        Database::class.java, "databasee")
-        .allowMainThreadQueries()
-            .build()
-        var issueDao = db.issueDao()
-        var user = GithubUser("TEST", ")")
-        var issue = GithubIssue("issue", 218,"open", user, "mmmmmmm","1","2", "3")
-        issueDao.insert(issue)
-
-//        loadIssue()
+//        var issueDao = db.issueDao()
+//        var user = GithubUser("TEST", ")")
+//        var issue = GithubIssue("issue", 218,"open", user, "mmmm1mmm","1","2", "3")
+//        issueDao.update(issue)
+        loadIssue()
         recyclerView.adapter = recyclerAdapter
-        recyclerAdapter.setList(issueDao.getAllIssue())
+//        recyclerAdapter.setList(IssueApplication.instance.databaseComponent.issueDao().getAllIssue())
     }
 
 

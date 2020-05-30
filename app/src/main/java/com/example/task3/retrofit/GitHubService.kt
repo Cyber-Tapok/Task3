@@ -1,4 +1,4 @@
-package com.example.task3
+package com.example.task3.retrofit
 
 import com.example.task3.model.GithubIssue
 import retrofit2.Call
