@@ -9,6 +9,7 @@ class IssueApplication : Application() {
     companion object {
         lateinit var instance: IssueApplication
     }
+
     lateinit var databaseComponent: DatabaseComponent
 
     override fun onCreate() {

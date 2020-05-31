@@ -11,5 +11,4 @@ class ViewModelFactory(private var issueRepository: IssueRepository) :
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return IssueViewModel(issueRepository) as T
     }
-
 }

@@ -38,7 +38,8 @@ class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: In
                 this.issueList,
                 issueList
             )
-        val issueDiffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(issueDiffUtilCallBack, false)
+        val issueDiffResult: DiffUtil.DiffResult =
+            DiffUtil.calculateDiff(issueDiffUtilCallBack, false)
         this.issueList = issueList
         issueDiffResult.dispatchUpdatesTo(this)
     }

@@ -3,7 +3,10 @@ package com.example.task3.utils
 import androidx.recyclerview.widget.DiffUtil
 import com.example.task3.model.GithubIssue
 
-class IssueDiffUtilCallback(private val oldList: List<GithubIssue>, private val newList: List<GithubIssue>): DiffUtil.Callback() {
+class IssueDiffUtilCallback(
+    private val oldList: List<GithubIssue>,
+    private val newList: List<GithubIssue>
+) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int {
         return oldList.size

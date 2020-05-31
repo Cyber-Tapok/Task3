@@ -1,4 +1,5 @@
 package com.example.task3.retrofit
+
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -10,7 +11,7 @@ const val USERNAME = "Cyber-Tapok"
 const val PASSWORD = "cdLE6fb3drLEnBH"
 const val REPOS = "TEST"
 
-class RetrofitClient  {
+class RetrofitClient {
     fun getService(): GitHubService {
         val okHttpClient = OkHttpClient().newBuilder().addInterceptor { chain ->
             val originalRequest: Request = chain.request()
