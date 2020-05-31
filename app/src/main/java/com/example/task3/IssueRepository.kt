@@ -3,8 +3,9 @@ package com.example.task3
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.task3.database.IssueDatabase
+import com.example.task3.enums.IssueState
+import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
-import com.example.task3.model.Status
 import com.example.task3.retrofit.REPOS
 import com.example.task3.retrofit.RetrofitClient
 import retrofit2.Call
@@ -20,10 +21,10 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
     private val service = RetrofitClient().getService()
 
 
-    fun getIssueListFromApi(): LiveData<List<GithubIssue>> {
+    fun getIssueListFromApi(issueState: IssueState): LiveData<List<GithubIssue>> {
         if (!isRequestStart) {
             isRequestStart = true
-            updateDb()
+            updateDb(issueState)
         }
         return issueList
     }
@@ -42,7 +43,7 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
         return issueList
     }
 
-    fun updateDb() {
+    private fun updateDb(issueState: IssueState) {
         val call: Call<List<GithubIssue>> = service.issueCall(USERNAME, REPOS)
         currentStatus.value = Status.NONE
         call.enqueue(object : Callback<List<GithubIssue>> {
@@ -68,7 +69,11 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
                 if (issueDatabase.issueDao().getAllIssue().isEmpty()) {
                     currentStatus.value = Status.EMPTY
                 } else {
-                    issueList.value = issueDatabase.issueDao().getAllIssue()
+                    issueList.value = when (issueState) {
+                        IssueState.ALL -> issueDatabase.issueDao().getAllIssue()
+                        IssueState.OPEN -> issueDatabase.issueDao().getCurrentIssue("open")
+                        IssueState.CLOSED -> issueDatabase.issueDao().getCurrentIssue("closed")
+                    }
                 }
                 isRequestStart = false
             }
