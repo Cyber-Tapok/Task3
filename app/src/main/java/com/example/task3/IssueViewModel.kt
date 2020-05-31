@@ -7,9 +7,12 @@ import com.example.task3.model.Status
 import javax.inject.Inject
 
 
-class IssueViewModel(var issueRepository: IssueRepository) : ViewModel() {
+class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel() {
 
     fun getAllIssue(): LiveData<List<GithubIssue>> {
+        return issueRepository.getIssueListFromApi()
+    }
+    fun getAllIssueDb(): LiveData<List<GithubIssue>> {
         return issueRepository.getFromDb()
     }
 

@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.task3.IssueRepository
 import com.example.task3.database.IssueDatabase
+import com.example.task3.retrofit.REPOS
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -25,8 +26,11 @@ class RoomModule(private val application: Application) {
     @Provides
     @Singleton
     fun providesDatabase(context: Context): IssueDatabase {
-        return Room.databaseBuilder(context, IssueDatabase::class.java, "databasee")
-            .allowMainThreadQueries().build()
+        return Room
+            .databaseBuilder(context, IssueDatabase::class.java, REPOS)
+            .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

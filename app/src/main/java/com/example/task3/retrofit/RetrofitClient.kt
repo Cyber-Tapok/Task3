@@ -7,6 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 const val BASE_URL = "https://api.github.com"
 const val USERNAME = "Cyber-Tapok"
+const val PASSWORD = "cdLE6fb3drLEnBH"
+const val REPOS = "TEST"
 
 class RetrofitClient  {
     fun getService(): GitHubService {
@@ -14,7 +16,7 @@ class RetrofitClient  {
             val originalRequest: Request = chain.request()
             val builder: Request.Builder = originalRequest.newBuilder().header(
                 "Authorization",
-                Credentials.basic(USERNAME, "cdLE6fb3drLEnBH")
+                Credentials.basic(USERNAME, PASSWORD)
             )
             val newRequest: Request = builder.build()
             chain.proceed(newRequest)

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.task3.database.IssueDatabase
 import com.example.task3.model.GithubIssue
 import com.example.task3.model.Status
+import com.example.task3.retrofit.REPOS
 import com.example.task3.retrofit.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,39 +14,19 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+const val USERNAME = "Cyber-Tapok"
 
 class IssueRepository(var issueDatabase: IssueDatabase) {
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
     private var isRequestStart: Boolean = false
+    private val service = RetrofitClient().getService()
 
 
     fun getIssueListFromApi(): LiveData<List<GithubIssue>> {
-        val service = RetrofitClient().getService()
         if (!isRequestStart) {
             isRequestStart = true
-            val call: Call<List<GithubIssue>> = service.issueCall("Cyber-Tapok", "TEST")
-            currentStatus.value = Status.NONE
-            call.enqueue(object : Callback<List<GithubIssue>> {
-                override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
-                    currentStatus.value = Status.FAILED
-                    isRequestStart = false
-                }
-
-                override fun onResponse(
-                    call: Call<List<GithubIssue>>,
-                    response: Response<List<GithubIssue>>
-                ) {
-                    response.body()?.let {
-                        issueList.value = response.body()
-                        currentStatus.value = Status.SUCCESS
-                    } ?: run {
-                        issueList.value = emptyList()
-                        currentStatus.value = Status.LIMIT
-                    }
-                    isRequestStart = false
-                }
-            })
+            updateDb()
         }
         return issueList
     }
@@ -54,7 +35,37 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
         return currentStatus
     }
     fun getFromDb(): LiveData<List<GithubIssue>> {
-            issueList.value = issueDatabase.issueDao().getAllIssue()
+        issueList.value = issueDatabase.issueDao().getAllIssue()
         return issueList
+    }
+    fun updateDb() {
+        val call: Call<List<GithubIssue>> = service.issueCall(USERNAME, REPOS)
+        currentStatus.value = Status.NONE
+        call.enqueue(object : Callback<List<GithubIssue>> {
+            override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
+                currentStatus.value = Status.FAILED
+                setDbList()
+            }
+            override fun onResponse(
+                call: Call<List<GithubIssue>>,
+                response: Response<List<GithubIssue>>
+            ) {
+                response.body()?.let {
+                    issueDatabase.issueDao().insert(response.body()!!)
+                    currentStatus.value = Status.SUCCESS
+                } ?: run {
+                    currentStatus.value = Status.LIMIT
+                }
+                setDbList()
+            }
+            fun setDbList() {
+                if (issueDatabase.issueDao().getAllIssue().isEmpty()) {
+                    currentStatus.value = Status.EMPTY
+                } else {
+                    issueList.value = issueDatabase.issueDao().getAllIssue()
+                }
+                isRequestStart = false
+            }
+        })
     }
 }

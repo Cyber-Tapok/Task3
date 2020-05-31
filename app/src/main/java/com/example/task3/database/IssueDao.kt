@@ -9,10 +9,6 @@ interface IssueDao {
     fun getAllIssue(): List<GithubIssue>
     @Query("SELECT * FROM issues WHERE number = :number")
     fun getById(number: Int): GithubIssue
-    @Insert
-    fun insert(githubIssue: GithubIssue)
-    @Delete
-    fun delete(githubIssue: GithubIssue)
-    @Update
-    fun update(githubIssue: GithubIssue)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(issueList: List<GithubIssue>)
 }

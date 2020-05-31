@@ -6,19 +6,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.task3.database.IssueDatabase
-import com.example.task3.di.DaggerDatabaseComponent
-import com.example.task3.di.RoomModule
 import com.example.task3.di.ViewModelFactory
 import com.example.task3.model.GithubIssue
 import com.example.task3.model.Status
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 import javax.inject.Inject
 
 const val SELECTED_ITEM_KEY = "selectItem"
@@ -38,6 +30,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         IssueApplication.instance.databaseComponent.inject(this)
         recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
@@ -46,13 +39,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
-//        var issueDao = db.issueDao()
-//        var user = GithubUser("TEST", ")")
-//        var issue = GithubIssue("issue", 218,"open", user, "mmmm1mmm","1","2", "3")
-//        issueDao.update(issue)
         loadIssue()
         recyclerView.adapter = recyclerAdapter
-//        recyclerAdapter.setList(IssueApplication.instance.databaseComponent.issueDao().getAllIssue())
     }
 
 
@@ -67,6 +55,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     private fun loadIssue() {
         swipeRefreshLayout.isRefreshing = true
+        recyclerAdapter.setList(issueViewModel.getAllIssueDb().value!!)
         issueViewModel.getAllIssue().observe(
             this,
             Observer { issues ->
@@ -75,13 +64,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                 } else {
                     recyclerAdapter.updateList(issues)
                 }
-                if (recyclerAdapter.issueList.isEmpty()) {
-                    Snackbar.make(
-                        recyclerView,
-                        getString(R.string.is_empty),
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
                 swipeRefreshLayout.isRefreshing = false
             })
         issueViewModel.internetStatus().observe(this, Observer { status ->
@@ -89,9 +71,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                 Status.FAILED -> getString(R.string.internet_connection)
                 Status.SUCCESS -> getString(R.string.load_success)
                 Status.LIMIT -> getString(R.string.limit_reached)
+                Status.EMPTY -> getString(R.string.is_empty)
                 else -> null
             }
-            snackBarMessage?. let {
+            snackBarMessage?.let {
                 Snackbar.make(
                     recyclerView,
                     snackBarMessage,

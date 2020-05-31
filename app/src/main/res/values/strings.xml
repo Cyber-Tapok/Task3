@@ -4,7 +4,7 @@
     <string name="updated_at">Updated at %1$s</string>
     <string name="closed_at">Closed at %1$s</string>
     <string name="is_empty">Issues list empty</string>
-    <string name="internet_connection">No internet connection</string>
+    <string name="internet_connection">No internet connection, load from db</string>
     <string name="load_success">Load success</string>
-    <string name="limit_reached">Limit reached</string>
+    <string name="limit_reached">Limit reached, load from db</string>
 </resources>
