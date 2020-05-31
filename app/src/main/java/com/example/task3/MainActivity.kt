@@ -1,6 +1,8 @@
 package com.example.task3
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -10,8 +12,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.task3.di.ViewModelFactory
 import com.example.task3.model.GithubIssue
 import com.example.task3.model.Status
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+
 
 const val SELECTED_ITEM_KEY = "selectItem"
 
@@ -30,7 +34,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         IssueApplication.instance.databaseComponent.inject(this)
         recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
         loadIssue()
         recyclerView.adapter = recyclerAdapter
+        val toolbar: MaterialToolbar = findViewById(R.id.issue_toolbar)
+        setSupportActionBar(toolbar)
     }
 
 
@@ -91,6 +96,28 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         bundle.putParcelable(FRAGMENT_BUNDLE_ISSUE_KEY, issue)
         fragment.arguments = bundle
         supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.sort_menu, menu)
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.item_all -> {
+                recyclerAdapter.updateList(issueViewModel.getAllIssueDb().value!!)
+                true
+            }
+            R.id.item_open -> {
+                recyclerAdapter.updateList(issueViewModel.getOpenIssue().value!!)
+                true
+            }
+            R.id.item_close -> {
+                recyclerAdapter.updateList(issueViewModel.getCloseIssue().value!!)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     fun resetAdapterSelectPosition() {

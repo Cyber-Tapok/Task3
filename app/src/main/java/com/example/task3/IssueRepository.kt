@@ -37,6 +37,11 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
         return issueList
     }
 
+    fun getCurrentFromDb(state: String): LiveData<List<GithubIssue>> {
+        issueList.value = issueDatabase.issueDao().getCurrentIssue(state)
+        return issueList
+    }
+
     fun updateDb() {
         val call: Call<List<GithubIssue>> = service.issueCall(USERNAME, REPOS)
         currentStatus.value = Status.NONE

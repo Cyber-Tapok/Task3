@@ -16,6 +16,14 @@ class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel()
         return issueRepository.getFromDb()
     }
 
+    fun getOpenIssue(): LiveData<List<GithubIssue>> {
+        return issueRepository.getCurrentFromDb("open")
+    }
+
+    fun getCloseIssue(): LiveData<List<GithubIssue>> {
+        return issueRepository.getCurrentFromDb("closed")
+    }
+
     fun internetStatus(): LiveData<Status> {
         return issueRepository.getCurrentStatus()
     }
