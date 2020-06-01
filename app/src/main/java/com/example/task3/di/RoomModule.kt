@@ -19,6 +19,7 @@ class RoomModule(private val application: Application) {
     }
 
     @Provides
+    @Singleton
     fun providesRepository(issueDatabase: IssueDatabase): IssueRepository {
         return IssueRepository(issueDatabase)
     }

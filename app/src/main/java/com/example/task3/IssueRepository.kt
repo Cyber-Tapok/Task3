@@ -29,6 +29,10 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
         return issueList
     }
 
+    fun updateDbWorker() {
+        updateDb(IssueState.ALL)
+    }
+
     fun getCurrentStatus(): LiveData<Status> {
         return currentStatus
     }
@@ -45,10 +49,10 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
 
     private fun updateDb(issueState: IssueState) {
         val call: Call<List<GithubIssue>> = service.issueCall(USERNAME, REPOS)
-        currentStatus.value = Status.NONE
+        currentStatus.postValue(Status.NONE)
         call.enqueue(object : Callback<List<GithubIssue>> {
             override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
-                currentStatus.value = Status.FAILED
+                currentStatus.postValue(Status.FAILED)
                 setDbList()
             }
 
@@ -58,22 +62,24 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
             ) {
                 response.body()?.let {
                     issueDatabase.issueDao().resetDb(response.body()!!)
-                    currentStatus.value = Status.SUCCESS
+                    currentStatus.postValue(Status.SUCCESS)
                 } ?: run {
-                    currentStatus.value = Status.LIMIT
+                    currentStatus.postValue(Status.LIMIT)
                 }
                 setDbList()
             }
 
             fun setDbList() {
                 if (issueDatabase.issueDao().getAllIssue().isEmpty()) {
-                    currentStatus.value = Status.EMPTY
+                    currentStatus.postValue(Status.EMPTY)
                 } else {
-                    issueList.value = when (issueState) {
-                        IssueState.ALL -> issueDatabase.issueDao().getAllIssue()
-                        IssueState.OPEN -> issueDatabase.issueDao().getCurrentIssue("open")
-                        IssueState.CLOSED -> issueDatabase.issueDao().getCurrentIssue("closed")
-                    }
+                    issueList.postValue(
+                        when (issueState) {
+                            IssueState.ALL -> issueDatabase.issueDao().getAllIssue()
+                            IssueState.OPEN -> issueDatabase.issueDao().getCurrentIssue("open")
+                            IssueState.CLOSED -> issueDatabase.issueDao().getCurrentIssue("closed")
+                        }
+                    )
                 }
                 isRequestStart = false
             }

@@ -9,12 +9,17 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.example.task3.di.ViewModelFactory
 import com.example.task3.enums.IssueState
-import com.example.task3.model.GithubIssue
 import com.example.task3.enums.Status
+import com.example.task3.model.GithubIssue
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -33,7 +38,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,16 +46,35 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         recyclerAdapter = IssuesAdapter(this, savedInstanceState?.getInt(SELECTED_ITEM_KEY) ?: -1)
         issueViewModel = ViewModelProviders.of(this, viewModelFactory)[IssueViewModel::class.java]
+        issueListState = (savedInstanceState?.getSerializable(SELECTED_STATE_ISSUES)
+            ?: IssueState.ALL) as IssueState
+        recyclerAdapter.setList(
+            when (issueListState) {
+                IssueState.ALL -> issueViewModel.getAllIssues().value!!
+                IssueState.OPEN -> issueViewModel.getOpenIssues().value!!
+                IssueState.CLOSED -> issueViewModel.getClosedIssues().value!!
+            }
+        )
+        recyclerView.adapter = recyclerAdapter
+        val uploadWorkRequest = PeriodicWorkRequest.Builder(
+            UpdateDbWorker::class.java,
+            15,
+            TimeUnit.MINUTES,
+            14,
+            TimeUnit.MINUTES
+        ).setConstraints(
+            Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+        ).build()
+        WorkManager.getInstance().enqueue(uploadWorkRequest)
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
-        issueListState = (savedInstanceState?.getSerializable(SELECTED_STATE_ISSUES) ?: IssueState.ALL) as IssueState
         loadIssue()
-        recyclerView.adapter = recyclerAdapter
         val toolbar: MaterialToolbar = findViewById(R.id.issue_toolbar)
         setSupportActionBar(toolbar)
     }
-
 
     override fun onRefresh() {
         issueViewModel.getUpdatedIssues(issueListState)
@@ -63,42 +86,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         outState.putSerializable(SELECTED_STATE_ISSUES, issueListState)
     }
 
-    private fun loadIssue() {
-        swipeRefreshLayout.isRefreshing = true
-        recyclerAdapter.setList(when (issueListState) {
-            IssueState.ALL -> issueViewModel.getAllIssues().value!!
-            IssueState.OPEN -> issueViewModel.getOpenIssues().value!!
-            IssueState.CLOSED -> issueViewModel.getClosedIssues().value!!
-        })
-        issueViewModel.getUpdatedIssues(issueListState).observe(
-            this,
-            Observer { issues ->
-                if (recyclerAdapter.issueList.isEmpty()) {
-                    recyclerAdapter.setList(issues)
-                } else {
-                    recyclerAdapter.updateList(issues)
-                }
-                swipeRefreshLayout.isRefreshing = false
-            })
-        issueViewModel.internetStatus().observe(this, Observer { status ->
-            val snackBarMessage = when (status) {
-                Status.FAILED -> getString(R.string.internet_connection)
-                Status.SUCCESS -> getString(R.string.load_success)
-                Status.LIMIT -> getString(R.string.limit_reached)
-                Status.EMPTY -> getString(R.string.is_empty)
-                else -> null
-            }
-            snackBarMessage?.let {
-                Snackbar.make(
-                    recyclerView,
-                    snackBarMessage,
-                    Snackbar.LENGTH_LONG
-                ).show()
-            }
-            swipeRefreshLayout.isRefreshing = false
-        })
-    }
-
     override fun openDetails(issue: GithubIssue) {
         val fragment = IssueDetailFragment()
         val bundle = Bundle()
@@ -106,11 +93,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         fragment.arguments = bundle
         supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.sort_menu, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_all -> {
@@ -132,7 +121,38 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         }
     }
 
+    private fun loadIssue() {
+        swipeRefreshLayout.isRefreshing = true
+        issueViewModel.getUpdatedIssues(issueListState).observe(
+            this,
+            Observer { issues ->
+                if (recyclerAdapter.issueList.isEmpty()) {
+                    recyclerAdapter.setList(issues)
+                } else {
+                    recyclerAdapter.updateList(issues)
+                }
+                swipeRefreshLayout.isRefreshing = false
+            })
+        issueViewModel.internetStatus().observe(this, Observer { status ->
+            val snackBarMessage = when (status) {
+                Status.FAILED -> getString(R.string.internet_connection)
+                Status.LIMIT -> getString(R.string.limit_reached)
+                Status.EMPTY -> getString(R.string.is_empty)
+                else -> null
+            }
+            snackBarMessage?.let {
+                Snackbar.make(
+                    recyclerView,
+                    snackBarMessage,
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+            swipeRefreshLayout.isRefreshing = false
+        })
+    }
+
     fun resetAdapterSelectPosition() {
         recyclerAdapter.resetSelectItem()
     }
+
 }

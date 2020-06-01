@@ -3,8 +3,8 @@ package com.example.task3
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.task3.enums.IssueState
-import com.example.task3.model.GithubIssue
 import com.example.task3.enums.Status
+import com.example.task3.model.GithubIssue
 
 
 class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel() {
