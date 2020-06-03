@@ -11,10 +11,13 @@ import com.example.task3.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
 const val USERNAME = "Cyber-Tapok"
 
-class IssueRepository(var issueDatabase: IssueDatabase) {
+@Singleton
+class IssueRepository @Inject constructor(var issueDatabase: IssueDatabase) {
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
     private var isRequestStart: Boolean = false
@@ -61,7 +64,7 @@ class IssueRepository(var issueDatabase: IssueDatabase) {
                 response: Response<List<GithubIssue>>
             ) {
                 response.body()?.let {
-                    issueDatabase.issueDao().resetDb(response.body()!!)
+                    issueDatabase.issueDao().resetDb(it)
                     currentStatus.postValue(Status.SUCCESS)
                 } ?: run {
                     currentStatus.postValue(Status.LIMIT)

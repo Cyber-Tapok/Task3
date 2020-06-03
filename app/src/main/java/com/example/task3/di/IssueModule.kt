@@ -14,17 +14,6 @@ import javax.inject.Singleton
 class IssueModule(private val application: Application) {
 
     @Provides
-    fun providerViewModelFactory(repository: IssueRepository): ViewModelFactory {
-        return ViewModelFactory(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesRepository(issueDatabase: IssueDatabase): IssueRepository {
-        return IssueRepository(issueDatabase)
-    }
-
-    @Provides
     @Singleton
     fun providesDatabase(context: Context): IssueDatabase {
         return Room
