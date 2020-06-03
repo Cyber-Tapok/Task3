@@ -6,7 +6,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [RoomModule::class])
+@Component(modules = [IssueModule::class])
 interface DatabaseComponent {
     fun inject(mainActivity: MainActivity)
     fun inject(updateDbWorker: UpdateDbWorker)

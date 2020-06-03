@@ -33,13 +33,8 @@ class IssuesAdapter(private val detailInfo: DetailInfo, var selectedPosition: In
     }
 
     fun updateList(issueList: List<GithubIssue>) {
-        val issueDiffUtilCallBack =
-            IssueDiffUtilCallback(
-                this.issueList,
-                issueList
-            )
-        val issueDiffResult: DiffUtil.DiffResult =
-            DiffUtil.calculateDiff(issueDiffUtilCallBack, false)
+        val issueDiffUtilCallBack = IssueDiffUtilCallback(this.issueList, issueList)
+        val issueDiffResult = DiffUtil.calculateDiff(issueDiffUtilCallBack, false)
         this.issueList = issueList
         issueDiffResult.dispatchUpdatesTo(this)
     }

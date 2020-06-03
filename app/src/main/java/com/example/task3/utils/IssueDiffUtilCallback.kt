@@ -21,6 +21,6 @@ class IssueDiffUtilCallback(
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].equals(newList[newItemPosition])
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }

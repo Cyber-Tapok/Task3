@@ -11,7 +11,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class RoomModule(private val application: Application) {
+class IssueModule(private val application: Application) {
 
     @Provides
     fun providerViewModelFactory(repository: IssueRepository): ViewModelFactory {

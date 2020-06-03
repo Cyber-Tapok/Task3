@@ -14,7 +14,7 @@ class UpdateDbWorker(
     lateinit var issueRepository: IssueRepository
 
     override fun doWork(): Result {
-        IssueApplication.instance.databaseComponent.inject(this)
+        (applicationContext as IssueApplication).databaseComponent.inject(this)
         return try {
             issueRepository.updateDbWorker()
             Result.success()
