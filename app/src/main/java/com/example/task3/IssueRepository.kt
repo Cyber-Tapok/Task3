@@ -3,13 +3,11 @@ package com.example.task3
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.task3.database.IssueDao
-import com.example.task3.database.IssueDatabase
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
 import com.example.task3.retrofit.GitHubService
 import com.example.task3.retrofit.REPOS
-import com.example.task3.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,7 +17,10 @@ import javax.inject.Singleton
 const val USERNAME = "Cyber-Tapok"
 
 @Singleton
-class IssueRepository @Inject constructor(val issueDao: IssueDao, val service: GitHubService) {
+class IssueRepository @Inject constructor(
+    val issueDao: IssueDao,
+    private val service: GitHubService
+) {
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
     private var isRequestStart: Boolean = false
@@ -42,12 +43,12 @@ class IssueRepository @Inject constructor(val issueDao: IssueDao, val service: G
     }
 
     fun getFromDb(): LiveData<List<GithubIssue>> {
-        issueList.value = issueDao.getAllIssue()
+        issueList.value = issueDao.getAllIssues()
         return issueList
     }
 
     fun getCurrentFromDb(state: String): LiveData<List<GithubIssue>> {
-        issueList.value = issueDao.getCurrentIssue(state)
+        issueList.value = issueDao.getIssuesByState(state)
         return issueList
     }
 
@@ -74,14 +75,14 @@ class IssueRepository @Inject constructor(val issueDao: IssueDao, val service: G
             }
 
             fun setDbList() {
-                if (issueDao.getAllIssue().isEmpty()) {
+                if (issueDao.getAllIssues().isEmpty()) {
                     currentStatus.postValue(Status.EMPTY)
                 } else {
                     issueList.postValue(
                         when (issueState) {
-                            IssueState.ALL -> issueDao.getAllIssue()
-                            IssueState.OPEN -> issueDao.getCurrentIssue("open")
-                            IssueState.CLOSED -> issueDao.getCurrentIssue("closed")
+                            IssueState.ALL -> issueDao.getAllIssues()
+                            IssueState.OPEN -> issueDao.getIssuesByState("open")
+                            IssueState.CLOSED -> issueDao.getIssuesByState("closed")
                         }
                     )
                 }

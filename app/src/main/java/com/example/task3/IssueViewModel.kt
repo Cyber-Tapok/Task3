@@ -13,16 +13,12 @@ class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel()
         return issueRepository.getIssueListFromApi(issueState)
     }
 
-    fun getAllIssues(): LiveData<List<GithubIssue>> {
-        return issueRepository.getFromDb()
-    }
-
-    fun getOpenIssues(): LiveData<List<GithubIssue>> {
-        return issueRepository.getCurrentFromDb("open")
-    }
-
-    fun getClosedIssues(): LiveData<List<GithubIssue>> {
-        return issueRepository.getCurrentFromDb("closed")
+    fun getIssues(state: IssueState): LiveData<List<GithubIssue>> {
+        return when (state) {
+            IssueState.ALL -> issueRepository.getFromDb()
+            IssueState.OPEN -> issueRepository.getCurrentFromDb("open")
+            IssueState.CLOSED -> issueRepository.getCurrentFromDb("closed")
+        }
     }
 
     fun internetStatus(): LiveData<Status> {

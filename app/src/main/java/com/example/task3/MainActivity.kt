@@ -9,17 +9,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
 import com.example.task3.di.ViewModelFactory
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
+import com.example.task3.workManager.UpdateDbWorkerRequest
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -48,26 +44,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueViewModel = ViewModelProviders.of(this, viewModelFactory)[IssueViewModel::class.java]
         issueListState = (savedInstanceState?.getSerializable(SELECTED_STATE_ISSUES)
             ?: IssueState.ALL) as IssueState
-        recyclerAdapter.setList(
-            when (issueListState) {
-                IssueState.ALL -> issueViewModel.getAllIssues().value!!
-                IssueState.OPEN -> issueViewModel.getOpenIssues().value!!
-                IssueState.CLOSED -> issueViewModel.getClosedIssues().value!!
-            }
-        )
+        recyclerAdapter.setList(issueViewModel.getIssues(issueListState).value!!)
         recyclerView.adapter = recyclerAdapter
-        val uploadWorkRequest = PeriodicWorkRequest.Builder(
-            UpdateDbWorker::class.java,
-            15,
-            TimeUnit.MINUTES,
-            14,
-            TimeUnit.MINUTES
-        ).setConstraints(
-            Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-        ).build()
-        WorkManager.getInstance().enqueue(uploadWorkRequest)
+        UpdateDbWorkerRequest().schedule()
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
@@ -101,24 +80,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.item_all -> {
-                issueListState = IssueState.ALL
-                recyclerAdapter.updateList(issueViewModel.getAllIssues().value!!)
-                true
-            }
-            R.id.item_open -> {
-                issueListState = IssueState.OPEN
-                recyclerAdapter.updateList(issueViewModel.getOpenIssues().value!!)
-                true
-            }
-            R.id.item_close -> {
-                issueListState = IssueState.CLOSED
-                recyclerAdapter.updateList(issueViewModel.getClosedIssues().value!!)
-                true
-            }
+        when (item.itemId) {
+            R.id.item_all -> issueListState = IssueState.ALL
+            R.id.item_open -> issueListState = IssueState.OPEN
+            R.id.item_close -> issueListState = IssueState.CLOSED
             else -> super.onOptionsItemSelected(item)
         }
+        recyclerAdapter.updateList(issueViewModel.getIssues(issueListState).value!!)
+        return true
     }
 
     private fun loadIssue() {

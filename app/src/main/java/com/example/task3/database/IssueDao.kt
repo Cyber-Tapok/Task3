@@ -12,10 +12,10 @@ interface IssueDao {
     }
 
     @Query("SELECT * FROM issues ORDER BY number DESC")
-    fun getAllIssue(): List<GithubIssue>
+    fun getAllIssues(): List<GithubIssue>
 
     @Query("SELECT * FROM issues WHERE state = :state ORDER BY number DESC")
-    fun getCurrentIssue(state: String): List<GithubIssue>
+    fun getIssuesByState(state: String): List<GithubIssue>
 
     @Query("SELECT * FROM issues WHERE number = :number ORDER BY number DESC")
     fun getById(number: Int): GithubIssue

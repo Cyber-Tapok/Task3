@@ -1,8 +1,10 @@
-package com.example.task3
+package com.example.task3.workManager
 
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.task3.IssueApplication
+import com.example.task3.IssueRepository
 import javax.inject.Inject
 
 class UpdateDbWorker(

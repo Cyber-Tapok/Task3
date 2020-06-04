@@ -1,7 +1,7 @@
 package com.example.task3.di
 
 import com.example.task3.MainActivity
-import com.example.task3.UpdateDbWorker
+import com.example.task3.workManager.UpdateDbWorker
 import dagger.Component
 import javax.inject.Singleton
 
