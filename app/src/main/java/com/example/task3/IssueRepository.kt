@@ -2,10 +2,12 @@ package com.example.task3
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.task3.database.IssueDao
 import com.example.task3.database.IssueDatabase
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
+import com.example.task3.retrofit.GitHubService
 import com.example.task3.retrofit.REPOS
 import com.example.task3.retrofit.RetrofitClient
 import retrofit2.Call
@@ -17,11 +19,10 @@ import javax.inject.Singleton
 const val USERNAME = "Cyber-Tapok"
 
 @Singleton
-class IssueRepository @Inject constructor(var issueDatabase: IssueDatabase) {
+class IssueRepository @Inject constructor(val issueDao: IssueDao, val service: GitHubService) {
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
     private var isRequestStart: Boolean = false
-    private val service = RetrofitClient().getService()
 
 
     fun getIssueListFromApi(issueState: IssueState): LiveData<List<GithubIssue>> {
@@ -41,12 +42,12 @@ class IssueRepository @Inject constructor(var issueDatabase: IssueDatabase) {
     }
 
     fun getFromDb(): LiveData<List<GithubIssue>> {
-        issueList.value = issueDatabase.issueDao().getAllIssue()
+        issueList.value = issueDao.getAllIssue()
         return issueList
     }
 
     fun getCurrentFromDb(state: String): LiveData<List<GithubIssue>> {
-        issueList.value = issueDatabase.issueDao().getCurrentIssue(state)
+        issueList.value = issueDao.getCurrentIssue(state)
         return issueList
     }
 
@@ -64,7 +65,7 @@ class IssueRepository @Inject constructor(var issueDatabase: IssueDatabase) {
                 response: Response<List<GithubIssue>>
             ) {
                 response.body()?.let {
-                    issueDatabase.issueDao().resetDb(it)
+                    issueDao.resetDb(it)
                     currentStatus.postValue(Status.SUCCESS)
                 } ?: run {
                     currentStatus.postValue(Status.LIMIT)
@@ -73,14 +74,14 @@ class IssueRepository @Inject constructor(var issueDatabase: IssueDatabase) {
             }
 
             fun setDbList() {
-                if (issueDatabase.issueDao().getAllIssue().isEmpty()) {
+                if (issueDao.getAllIssue().isEmpty()) {
                     currentStatus.postValue(Status.EMPTY)
                 } else {
                     issueList.postValue(
                         when (issueState) {
-                            IssueState.ALL -> issueDatabase.issueDao().getAllIssue()
-                            IssueState.OPEN -> issueDatabase.issueDao().getCurrentIssue("open")
-                            IssueState.CLOSED -> issueDatabase.issueDao().getCurrentIssue("closed")
+                            IssueState.ALL -> issueDao.getAllIssue()
+                            IssueState.OPEN -> issueDao.getCurrentIssue("open")
+                            IssueState.CLOSED -> issueDao.getCurrentIssue("closed")
                         }
                     )
                 }
