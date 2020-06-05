@@ -18,12 +18,7 @@ class IssueModule(private val application: Application) {
     @Provides
     @Singleton
     fun providesDatabase(context: Context): IssueDao {
-        return Room
-            .databaseBuilder(context, IssueDatabase::class.java, REPOS)
-            .allowMainThreadQueries()
-            .fallbackToDestructiveMigration()
-            .build()
-            .issueDao()
+        return IssueDatabase.start(context)
     }
 
     @Provides

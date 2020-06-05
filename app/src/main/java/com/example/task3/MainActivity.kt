@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueViewModel = ViewModelProviders.of(this, viewModelFactory)[IssueViewModel::class.java]
         issueListState = (savedInstanceState?.getSerializable(SELECTED_STATE_ISSUES)
             ?: IssueState.ALL) as IssueState
-        recyclerAdapter.setList(issueViewModel.getIssues(issueListState).value!!)
         recyclerView.adapter = recyclerAdapter
         UpdateDbWorkerRequest().schedule()
         swipeRefreshLayout = findViewById(R.id.swipe_container)
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     override fun onRefresh() {
-        issueViewModel.getUpdatedIssues(issueListState)
+        issueViewModel.updatedIssues()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -86,22 +85,23 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             R.id.item_close -> issueListState = IssueState.CLOSED
             else -> super.onOptionsItemSelected(item)
         }
-        recyclerAdapter.updateList(issueViewModel.getIssues(issueListState).value!!)
+        issueViewModel.getIssues(issueListState)
         return true
     }
 
     private fun loadIssue() {
-        swipeRefreshLayout.isRefreshing = true
-        issueViewModel.getUpdatedIssues(issueListState).observe(
-            this,
-            Observer { issues ->
+        issueViewModel.issues.observe(this, Observer {
+            swipeRefreshLayout.isRefreshing = true
+            it?.let {
                 if (recyclerAdapter.issueList.isEmpty()) {
-                    recyclerAdapter.setList(issues)
+                    recyclerAdapter.setList(it)
                 } else {
-                    recyclerAdapter.updateList(issues)
+                    recyclerAdapter.updateList(it)
                 }
-                swipeRefreshLayout.isRefreshing = false
-            })
+            }
+            swipeRefreshLayout.isRefreshing = false
+        })
+        issueViewModel.updatedIssues()
         issueViewModel.internetStatus().observe(this, Observer { status ->
             val snackBarMessage = when (status) {
                 Status.FAILED -> getString(R.string.internet_connection)
@@ -116,8 +116,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                     Snackbar.LENGTH_LONG
                 ).show()
             }
-            swipeRefreshLayout.isRefreshing = false
         })
+        swipeRefreshLayout.isRefreshing = false
     }
 
     fun resetAdapterSelectPosition() {

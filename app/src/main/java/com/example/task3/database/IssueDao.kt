@@ -1,5 +1,6 @@
 package com.example.task3.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.task3.model.GithubIssue
 
@@ -12,13 +13,10 @@ interface IssueDao {
     }
 
     @Query("SELECT * FROM issues ORDER BY number DESC")
-    fun getAllIssues(): List<GithubIssue>
+    fun getAllIssues(): LiveData<List<GithubIssue>>
 
     @Query("SELECT * FROM issues WHERE state = :state ORDER BY number DESC")
-    fun getIssuesByState(state: String): List<GithubIssue>
-
-    @Query("SELECT * FROM issues WHERE number = :number ORDER BY number DESC")
-    fun getById(number: Int): GithubIssue
+    fun getIssuesByState(state: String): LiveData<List<GithubIssue>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(issueList: List<GithubIssue>)

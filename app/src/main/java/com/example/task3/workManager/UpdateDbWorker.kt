@@ -18,7 +18,7 @@ class UpdateDbWorker(
     override fun doWork(): Result {
         (applicationContext as IssueApplication).databaseComponent.inject(this)
         return try {
-            issueRepository.updateDbWorker()
+            issueRepository.updateDb()
             Result.success()
         } catch (e: Exception) {
             Result.failure()
