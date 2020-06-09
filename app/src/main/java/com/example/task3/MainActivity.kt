@@ -79,11 +79,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.item_all -> issueListState = IssueState.ALL
-            R.id.item_open -> issueListState = IssueState.OPEN
-            R.id.item_close -> issueListState = IssueState.CLOSED
-            else -> super.onOptionsItemSelected(item)
+        issueListState = when (item.itemId) {
+            R.id.item_all -> IssueState.ALL
+            R.id.item_open -> IssueState.OPEN
+            R.id.item_close -> IssueState.CLOSED
+            else -> return super.onOptionsItemSelected(item)
         }
         issueViewModel.getIssues(issueListState)
         return true

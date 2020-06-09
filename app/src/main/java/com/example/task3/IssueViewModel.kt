@@ -25,14 +25,15 @@ class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel()
         issueRepository.updateDb()
     }
 
-    val issues: LiveData<List<GithubIssue>> get() = issueList
+    val issues: LiveData<List<GithubIssue>>
+        get() = issueList
 
     fun getIssues(state: IssueState) {
-        issueRepository.getByState(state)
+        issueRepository.updateIssuesState(state)
     }
 
     override fun onCleared() {
-        issueRepository.issueList.observeForever(dataObserver)
+        issueRepository.issueList.removeObserver(dataObserver)
         super.onCleared()
     }
 

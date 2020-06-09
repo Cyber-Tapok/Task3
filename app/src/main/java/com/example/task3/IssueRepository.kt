@@ -1,8 +1,10 @@
 package com.example.task3
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import com.example.task3.database.IssueDao
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
@@ -27,22 +29,32 @@ class IssueRepository @Inject constructor(
 ) {
     val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
+    private val issueStateLiveData: MutableLiveData<IssueState> = MutableLiveData()
     private var isRequestStart: Boolean = false
     private val issueListObserver = Observer<List<GithubIssue>> {
         it ?: return@Observer
         issueList.value = it
     }
+    private val test = Observer<IssueState> {
+        it ?: return@Observer
+        Log.e("TEST", it.toString())
+    }
 
     init {
         issueDao.getAllIssues().observeForever(issueListObserver)
+        issueStateLiveData.observeForever(test)
     }
 
     fun getByState(issueState: IssueState) {
-        when (issueState) {
-            IssueState.ALL -> issueDao.getAllIssues().observeForever(issueListObserver)
-            IssueState.OPEN -> issueDao.getIssuesByState("open").observeForever(issueListObserver)
-            IssueState.CLOSED -> issueDao.getIssuesByState("closed").observeForever(issueListObserver)
-        }
+
+//        when (issueState) {
+//            IssueState.ALL -> issueDao.getAllIssues().observeForever(issueListObserver)
+//            IssueState.OPEN -> issueDao.getIssuesByState("open").observeForever(issueListObserver)
+//            IssueState.CLOSED -> issueDao.getIssuesByState("closed").observeForever(issueListObserver)
+//        }
+    }
+    fun updateIssuesState(issueState: IssueState) {
+        issueStateLiveData.postValue(issueState)
     }
 
     fun updateDb() {
@@ -53,6 +65,7 @@ class IssueRepository @Inject constructor(
             call.enqueue(object : Callback<List<GithubIssue>> {
                 override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
                     currentStatus.postValue(Status.FAILED)
+                    isRequestStart = false
                 }
 
                 override fun onResponse(
