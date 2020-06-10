@@ -1,9 +1,6 @@
 package com.example.task3
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
@@ -12,6 +9,7 @@ import com.example.task3.model.GithubIssue
 class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel() {
 
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
+    private val issueStateLiveData: MutableLiveData<IssueState> = MutableLiveData()
     private val dataObserver = Observer<List<GithubIssue>> {
         it ?: return@Observer
         issueList.value = it
@@ -19,6 +17,7 @@ class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel()
 
     init {
         issueRepository.issueList.observeForever(dataObserver)
+        issueStateLiveData.value = IssueState.ALL
     }
 
     fun updatedIssues() {
@@ -26,10 +25,12 @@ class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel()
     }
 
     val issues: LiveData<List<GithubIssue>>
-        get() = issueList
+        get() = Transformations.switchMap(issueStateLiveData) {
+            issueRepository.getByState(it)
+        }
 
     fun getIssues(state: IssueState) {
-        issueRepository.updateIssuesState(state)
+        issueStateLiveData.postValue(state)
     }
 
     override fun onCleared() {

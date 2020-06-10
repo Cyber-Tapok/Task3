@@ -1,10 +1,8 @@
 package com.example.task3
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import com.example.task3.database.IssueDao
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
@@ -29,32 +27,22 @@ class IssueRepository @Inject constructor(
 ) {
     val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
-    private val issueStateLiveData: MutableLiveData<IssueState> = MutableLiveData()
     private var isRequestStart: Boolean = false
     private val issueListObserver = Observer<List<GithubIssue>> {
         it ?: return@Observer
         issueList.value = it
     }
-    private val test = Observer<IssueState> {
-        it ?: return@Observer
-        Log.e("TEST", it.toString())
-    }
 
     init {
         issueDao.getAllIssues().observeForever(issueListObserver)
-        issueStateLiveData.observeForever(test)
     }
 
-    fun getByState(issueState: IssueState) {
-
-//        when (issueState) {
-//            IssueState.ALL -> issueDao.getAllIssues().observeForever(issueListObserver)
-//            IssueState.OPEN -> issueDao.getIssuesByState("open").observeForever(issueListObserver)
-//            IssueState.CLOSED -> issueDao.getIssuesByState("closed").observeForever(issueListObserver)
-//        }
-    }
-    fun updateIssuesState(issueState: IssueState) {
-        issueStateLiveData.postValue(issueState)
+    fun getByState(issueState: IssueState): LiveData<List<GithubIssue>> {
+        return when (issueState) {
+            IssueState.ALL -> issueDao.getAllIssues()
+            IssueState.OPEN -> issueDao.getIssuesByState("open")
+            IssueState.CLOSED -> issueDao.getIssuesByState("closed")
+        }
     }
 
     fun updateDb() {
