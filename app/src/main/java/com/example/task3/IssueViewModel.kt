@@ -24,8 +24,7 @@ class IssueViewModel(private val issueRepository: IssueRepository) : ViewModel()
         issueRepository.updateDb()
     }
 
-    val issues: LiveData<List<GithubIssue>>
-        get() = Transformations.switchMap(issueStateLiveData) {
+    val issues = Transformations.switchMap(issueStateLiveData) {
             issueRepository.getByState(it)
         }
 
