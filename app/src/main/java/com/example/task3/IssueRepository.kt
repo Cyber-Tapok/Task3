@@ -38,13 +38,13 @@ class IssueRepository @Inject constructor(
             currentStatus.postValue(Status.NONE)
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val test = service.issueCall(USERNAME, REPOS)
-                    if (test.isEmpty()) {
+                    val issueList = service.issueCall(USERNAME, REPOS)
+                    if (issueList.isEmpty()) {
                         currentStatus.postValue(Status.EMPTY)
                     } else {
                         currentStatus.postValue(Status.SUCCESS)
                     }
-                    issueDao.resetDb(test)
+                    issueDao.resetDb(issueList)
                 } catch (e: Exception) {
                     currentStatus.postValue(Status.FAILED)
                 }
