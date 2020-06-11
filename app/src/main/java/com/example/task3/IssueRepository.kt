@@ -25,17 +25,8 @@ class IssueRepository @Inject constructor(
     val issueDao: IssueDao,
     private val service: GitHubService
 ) {
-    val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
     private var isRequestStart: Boolean = false
-    private val issueListObserver = Observer<List<GithubIssue>> {
-        it ?: return@Observer
-        issueList.value = it
-    }
-
-    init {
-        issueDao.getAllIssues().observeForever(issueListObserver)
-    }
 
     fun getByState(issueState: IssueState): LiveData<List<GithubIssue>> {
         return when (issueState) {

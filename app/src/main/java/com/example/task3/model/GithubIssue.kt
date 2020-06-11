@@ -15,7 +15,7 @@ data class GithubIssue(
     val state: String,
     @Embedded(prefix = "user") val user: GithubUser,
     val body: String?,
-    @SerializedName("created_at") var createdAt: String,
-    @SerializedName("updated_at") var updatedAt: String?,
-    @SerializedName("closed_at") var closedAt: String?
+    @SerializedName("created_at") val createdAt: String,
+    @SerializedName("updated_at") val updatedAt: String?,
+    @SerializedName("closed_at") val closedAt: String?
 ) : Parcelable

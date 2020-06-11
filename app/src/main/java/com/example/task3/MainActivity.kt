@@ -85,18 +85,18 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             R.id.item_close -> IssueState.CLOSED
             else -> return super.onOptionsItemSelected(item)
         }
-        issueViewModel.getIssues(issueListState)
+        issueViewModel.setIssueState(issueListState)
         return true
     }
 
     private fun loadIssue() {
-        issueViewModel.issues.observe(this, Observer {
+        issueViewModel.issues.observe(this, Observer {issues ->
             swipeRefreshLayout.isRefreshing = true
-            it?.let {
+            issues?.let {
                 if (recyclerAdapter.issueList.isEmpty()) {
-                    recyclerAdapter.setList(it)
+                    recyclerAdapter.setList(issues)
                 } else {
-                    recyclerAdapter.updateList(it)
+                    recyclerAdapter.updateList(issues)
                 }
             }
             swipeRefreshLayout.isRefreshing = false
