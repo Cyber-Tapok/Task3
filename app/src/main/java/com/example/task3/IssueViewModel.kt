@@ -6,7 +6,7 @@ import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
 
 
-class IssueViewModel(private var issueRepository: IssueRepository) : ViewModel() {
+class IssueViewModel(private val issueRepository: IssueRepository) : ViewModel() {
 
     private val issueList: MutableLiveData<List<GithubIssue>> = MutableLiveData<List<GithubIssue>>()
     private val issueStateLiveData: MutableLiveData<IssueState> = MutableLiveData()
