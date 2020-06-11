@@ -1,17 +1,14 @@
 package com.example.task3
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
 import com.example.task3.workManager.UpdateDbWorkerRequest
+import kotlinx.coroutines.launch
 
 
 class IssueViewModel(private val issueRepository: IssueRepository) : ViewModel() {
     private val issueStateLiveData: MutableLiveData<IssueState> = MutableLiveData()
-
 
     init {
         issueStateLiveData.value = IssueState.ALL
@@ -19,7 +16,7 @@ class IssueViewModel(private val issueRepository: IssueRepository) : ViewModel()
     }
 
     fun updatedIssues() {
-        issueRepository.updateDb()
+        viewModelScope.launch { issueRepository.updateDb() }
     }
 
     val issues = Transformations.switchMap(issueStateLiveData) {

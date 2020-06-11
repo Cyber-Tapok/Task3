@@ -2,7 +2,6 @@ package com.example.task3
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.example.task3.database.IssueDao
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
@@ -13,16 +12,13 @@ import com.example.task3.retrofit.USERNAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
 class IssueRepository @Inject constructor(
-    val issueDao: IssueDao,
+    private val issueDao: IssueDao,
     private val service: GitHubService
 ) {
     private val currentStatus: MutableLiveData<Status> = MutableLiveData()
@@ -36,35 +32,24 @@ class IssueRepository @Inject constructor(
         }
     }
 
-    fun updateDb() {
+    suspend fun updateDb() {
         if (!isRequestStart) {
             isRequestStart = true
-            val call: Call<List<GithubIssue>> = service.issueCall(USERNAME, REPOS)
             currentStatus.postValue(Status.NONE)
-            call.enqueue(object : Callback<List<GithubIssue>> {
-                override fun onFailure(call: Call<List<GithubIssue>>, t: Throwable) {
-                    currentStatus.postValue(Status.FAILED)
-                    isRequestStart = false
-                }
-
-                override fun onResponse(
-                    call: Call<List<GithubIssue>>,
-                    response: Response<List<GithubIssue>>
-                ) {
-                    response.body()?.let {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            if (it.isEmpty()) {
-                                currentStatus.postValue(Status.EMPTY)
-                            }
-                            issueDao.resetDb(it)
-                        }
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val test = service.issueCall(USERNAME, REPOS)
+                    if (test.isEmpty()) {
+                        currentStatus.postValue(Status.EMPTY)
+                    } else {
                         currentStatus.postValue(Status.SUCCESS)
-                    } ?: run {
-                        currentStatus.postValue(Status.LIMIT)
                     }
-                    isRequestStart = false
+                    issueDao.resetDb(test)
+                } catch (e: Exception) {
+                    currentStatus.postValue(Status.FAILED)
                 }
-            })
+                isRequestStart = false
+            }
         }
     }
 

@@ -13,7 +13,6 @@ import com.example.task3.di.ViewModelFactory
 import com.example.task3.enums.IssueState
 import com.example.task3.enums.Status
 import com.example.task3.model.GithubIssue
-import com.example.task3.workManager.UpdateDbWorkerRequest
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -45,7 +44,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueListState = (savedInstanceState?.getSerializable(SELECTED_STATE_ISSUES)
             ?: IssueState.ALL) as IssueState
         recyclerView.adapter = recyclerAdapter
-        UpdateDbWorkerRequest().schedule()
         swipeRefreshLayout = findViewById(R.id.swipe_container)
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
@@ -56,6 +54,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onRefresh() {
         issueViewModel.updatedIssues()
+        swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -90,7 +89,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun loadIssue() {
-        issueViewModel.issues.observe(this, Observer {issues ->
+        issueViewModel.issues.observe(this, Observer { issues ->
             swipeRefreshLayout.isRefreshing = true
             issues?.let {
                 if (recyclerAdapter.issueList.isEmpty()) {
@@ -105,7 +104,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         issueViewModel.internetStatus().observe(this, Observer { status ->
             val snackBarMessage = when (status) {
                 Status.FAILED -> getString(R.string.internet_connection)
-                Status.LIMIT -> getString(R.string.limit_reached)
                 Status.EMPTY -> getString(R.string.is_empty)
                 else -> null
             }
