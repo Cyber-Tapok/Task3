@@ -91,12 +91,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private fun loadIssue() {
         issueViewModel.issues.observe(this, Observer { issues ->
             swipeRefreshLayout.isRefreshing = true
-            issues?.let {
-                if (recyclerAdapter.issueList.isEmpty()) {
-                    recyclerAdapter.setList(issues)
-                } else {
-                    recyclerAdapter.updateList(issues)
-                }
+            if (recyclerAdapter.issueList.isEmpty()) {
+                recyclerAdapter.setList(issues)
+            } else {
+                recyclerAdapter.updateList(issues)
             }
             swipeRefreshLayout.isRefreshing = false
         })

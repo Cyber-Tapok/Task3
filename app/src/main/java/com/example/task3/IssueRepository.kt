@@ -9,9 +9,8 @@ import com.example.task3.model.GithubIssue
 import com.example.task3.retrofit.GitHubService
 import com.example.task3.retrofit.REPOS
 import com.example.task3.retrofit.USERNAME
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,7 +35,7 @@ class IssueRepository @Inject constructor(
         if (!isRequestStart) {
             isRequestStart = true
             currentStatus.postValue(Status.NONE)
-            CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.IO) {
                 try {
                     val issueList = service.issueCall(USERNAME, REPOS)
                     if (issueList.isEmpty()) {
