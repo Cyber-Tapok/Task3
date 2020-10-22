@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 const val BASE_URL = "https://api.github.com"
 const val USERNAME = "Cyber-Tapok"
-const val PASSWORD = "cdLE6fb3drLEnBH"
+const val PASSWORD = "c*"
 const val REPOS = "TEST"
 
 class RetrofitClient {
